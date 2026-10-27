@@ -20,8 +20,16 @@ from typing import Any, Optional
 import anyio
 from mcp.server.fastmcp import FastMCP
 
-from engine import convert, extract, fields, save
-from engine.session import HwpSession, preimport_pyhwpx
+import sys
+
+if sys.platform == "win32":
+    from engine import convert, extract, fields, save
+    from engine.session import HwpSession, preimport_pyhwpx
+else:
+    # macOS: 한컴 COM 이 없다 — 같은 도구를 python-hwpx(한컴 없이 HWPX/HWP 편집)로 처리한다(engine/mac).
+    # HWPX→PDF 는 LibreOffice 로 만든 근사본이며 결과에 approximate=True 가 붙는다.
+    from engine.mac import convert, extract, fields, save
+    from engine.mac.session import HwpSession, preimport_pyhwpx
 
 # ---- 단일 세션 관리(지연 초기화) -------------------------------------------
 _session: Optional[HwpSession] = None
@@ -62,6 +70,9 @@ mcp = FastMCP(
         "convert_hwp_to_hwpx → extract_hwpx →(LLM이 {{필드명}} 자리표시자 삽입)→ "
         "insert_fields_by_bracket → fill_fields → convert_hwpx_to_pdf. "
         "경로는 절대경로를 권장. 동일 이름 필드는 fill_fields가 모두 같은 값으로 채운다."
+        + ("" if sys.platform == "win32" else
+           " (macOS: 한컴 없이 python-hwpx 로 처리한다. convert_hwpx_to_pdf 는 내용 확인용 근사 PDF(approximate=true)이며 "
+           "제출용 PDF 는 Windows 한컴에서 만든다.)")
     ),
 )
 
@@ -161,7 +172,8 @@ async def convert_hwpx_to_pdf(src_path: str, out_path: str) -> dict:
     Returns: {"out_path": PDF 경로}
     """
     def work():
-        return {"out_path": _run(lambda h: convert.hwpx_to_pdf(h, src_path, out_path))}
+        r = _run(lambda h: convert.hwpx_to_pdf(h, src_path, out_path))
+        return r if isinstance(r, dict) else {"out_path": r}  # macOS 판은 approximate·note 를 함께 준다
     return await anyio.to_thread.run_sync(work)
 
 
