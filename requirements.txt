@@ -1,5 +1,7 @@
 # 검증 환경(2026-06): Python 3.12.10 / Windows 11 / 한컴오피스 2024
 mcp>=1.28.0
-pyhwpx>=1.7.2
+pyhwpx>=1.7.2; sys_platform == "win32"
 # pyhwpx가 자동 설치: pywin32, pandas, numpy, pillow, pyperclip, openpyxl
 # mcp가 자동 설치: anyio, pydantic, httpx, starlette, uvicorn 등
+# macOS: 한컴 없이 HWPX/HWP 를 다룬다(Apache-2.0). HWPX→PDF 근사본만 LibreOffice(무료, 별도 설치)를 쓴다.
+python-hwpx==6.9.0; sys_platform == "darwin"

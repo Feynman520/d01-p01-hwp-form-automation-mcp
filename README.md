@@ -23,6 +23,25 @@
 - Python 3.10+ — 검증: **3.12**
 - [Claude Code](https://claude.com/claude-code) 또는 임의의 MCP 클라이언트
 
+## macOS (한컴 없이)
+
+macOS 에는 한컴 COM 이 없어 같은 도구 8개를 **python-hwpx**(Apache-2.0, 한컴 없이 HWPX/HWP 를 열고 고치는 라이브러리)로
+처리한다 — `server.py` 가 `engine/` 대신 `engine/mac/`(같은 모듈 이름·같은 함수·같은 반환)을 고른다.
+
+| 도구 | macOS 에서 |
+|---|---|
+| `convert_hwp_to_hwpx` | HWP 5.0 바이너리를 HWPX 로(python-hwpx 변환기) |
+| `extract_hwpx` | 본문·누름틀·셀 필드(`hp:tc@name`)·표 |
+| `insert_fields_by_bracket` | `{{이름}}` → 그 자리에 누름틀(실제 한컴 모양 CLICK_HERE), `[[이름]]` → 그 표 칸을 셀 필드로 |
+| `fill_fields` | 같은 이름은 모두 같은 값, 저장 뒤 다시 읽어 검증 |
+| `save_hwpx` | python-hwpx 로 열고 다시 써서 정규화 |
+| `convert_hwpx_to_pdf` | **근사본**: 본문·표를 HTML 로 내보내 LibreOffice(무료, 별도 설치)로 A4 PDF. 결과에 `approximate: true` 와 안내가 붙는다 — 쪽 배치·글꼴·표 모양은 한컴과 다르므로 제출용 PDF 는 Windows 한컴에서 만든다 |
+| `hwp_health` | `["python-hwpx", 판]` |
+
+- 설치: `pip install -r requirements.txt` 가 macOS 에서는 `python-hwpx` 를, Windows 에서는 `pyhwpx` 를 깐다.
+- 결과 HWPX 는 OWPML 스키마 검사(`HwpxDocument.validate`)를 통과한다. 실제 한컴에서 여는 확인은 Windows 에서 한 번 더 할 것.
+- 검사: `python tests/mac_engine.py`(17개 — 누름틀 자리·같은 이름 채움·스키마·HWP 왕복·근사 PDF).
+
 ## 설치
 
 ```powershell
