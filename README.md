@@ -100,3 +100,9 @@ $env:PYTHONUTF8 = "1"
 ## 라이선스
 
 [MIT](LICENSE) (단, 위 한컴 보안모듈 DLL 제외)
+
+## 기여 (Contributing)
+
+의견과 PR 안내는 [CONTRIBUTING.md](CONTRIBUTING.md)를, 보안 문제 신고는 [SECURITY.md](SECURITY.md)를 봐 주세요.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute and [SECURITY.md](SECURITY.md) for reporting security issues.
